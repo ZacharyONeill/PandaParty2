@@ -197,11 +197,13 @@ package org.as3kinect
 							var _x:int = blob.rect.x + (blob.rect.width / 2);
 							var _y:int = blob.rect.y + (blob.rect.height / 2);
 							//Add a point to the object
+						
 							blob.point = new Point(_x, _y);
 			                blobs.push(new Array(blob,new Array(blob.rect.x+blob.rect.width/2, blob.rect.bottom)));
 			            }
+						
 						//Finally we paint our blob to a BLOB_PROCESSED_COLOR so we can discard it in the next pass
-			            r.floodFill(xx, yy, 0X6600CC);
+			           r.floodFill(xx, yy, 0X6600CC);
 			        }
 			    }
 			    i++;

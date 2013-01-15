@@ -87,7 +87,7 @@
 		{
 			this.stop();
 			this.gotoAndStop("Lesson");
-			var lesson:Lessons = new LessonOne(this);
+			
 			
 			//Instantiating the wrapper library
 			_as3w = new as3kinectWrapper();
@@ -112,11 +112,9 @@
 			_blobs_on = true;
 			
 			//_staff_bw_bmp.x += _staff_bw_bmp.width;
-			//this.addChild(_staff_bw_bmp);
+			this.addChild(_staff_bw_bmp);
 			//On every frame call the update method
 			this.addEventListener(Event.ENTER_FRAME, update);
-			
-			
 		}
 		
 		
@@ -139,6 +137,7 @@
 				//Process Blobs from image
 				_staff_array = as3kinectUtils.getLines(_staff_bw_bmp.bitmapData,_staff_color_bmp.bitmapData);
 				
+				//trace(_staff_array);
 				//are there 5 blobs? we have our staff, yay
 				if(_staff_array.length === 5) {
 					trace('All lines found. Begin Lesson 1.');
@@ -146,11 +145,11 @@
 						tempStaff[i].push(new Array(_staff_array[i][1][0], _staff_array[i][1][1]));
 					}
 					
+			
 					_staff_array = new Array();
 					_staff_array = tempStaff;
 					
 					this.removeEventListener(Event.ENTER_FRAME, update);
-					
 					findNoteCoords();
 				}
 				
@@ -162,7 +161,7 @@
 		
 		private function findNoteCoords() {
 			_staff_array.reverse();
-			
+trace('called');
 			//if second line's y - first line's y is greater than 0, create line spacing
 			if(_staff_array[1][1][1] - _staff_array[0][1][1] > 0)
 				_line_spacing =  (_staff_array[1][1][1] - _staff_array[0][1][1])/2;
@@ -189,8 +188,8 @@
 			//temp_staff.reverse();
 			//gotoAndStop("Play");
 			noteDetection();
-			//var lesson:Lessons = new LessonOne(this);
-			trace("trace note arr from findnotecoords "+_notearr);
+			var lesson:Lessons = new LessonOne(this);
+			//trace("trace note arr from findnotecoords "+_notearr);
 			
 			/*
 			for(var j=0; j < _staff.length; j++) {
@@ -202,7 +201,7 @@
 		private function noteDetection()
 		{
 			
-			
+			trace('note detect called');
 			//Instantiating the wrapper library
 			//Add as3kinectWrapper events (depth, video and acceleration data)
 			_as3w.addEventListener(as3kinectWrapperEvent.ON_VIDEO, searchForNotes);
@@ -221,9 +220,9 @@
 			//_noblack_bmp.bitmapData = Filters.applyBWFilterToBitmapData(_canvas_video_feed); 			 //apply filter to bitmap we want to be black and white.
 		
 		
-		trace('begin note detection');
+			trace('begin note detection');
 			//add to screen
-			this.addChild(_bw_bmp);
+			//this.addChild(_bw_bmp);
 			_bw_bmp.x = _bw_bmp.width;
 			this.addChild(_bw_bmp);
 			
@@ -255,6 +254,7 @@
 				_blob_array = as3kinectUtils.getBlobs(_bw_bmp.bitmapData,_color_bmp.bitmapData,_canvas_video_feed);
 			}
 			
+			//every second, storeNotesOnStaff
 			if(_blob_array.length > 0) {
 				storeNotesOnStaff();
 			}
@@ -263,12 +263,18 @@
 		//the notes on the map right now - what are they?
 		private function storeNotesOnStaff() {
 			var buffer:int = 5;
+			trace('storenotesonstaff has been called');
 			
 			if(_blob_array.length > 0) {
+				
+				trace('there is a blob');
+				
 				for(var i:int=0; i < _blob_array.length; i++) {
 					
 					
 					for(var j:int = 0; j < _notearr.length; j++) {
+						
+						
 						var tracer:int = _blob_array[i][1].y + _blob_array[i][1].height - buffer;
 						/* a million debug statements because that's what i do
 						trace("tracing "+tracer);
@@ -282,38 +288,48 @@
 						trace("print val"+traceit);
 						*/
 						if(j+1 < _notearr.length) {
-							//trace("valid");
+							var thething = 1;
+							//trace("valid "+thething);
+							 
+							 
+							var blobLoc:int = _blob_array[i][1].y + _blob_array[i][1].height - buffer;
+							trace("blob 1:"+blobLoc+", line 1:"+ _notearr[j][1][1]+", line 2:"+_notearr[j+1][1][1]);
+							
 							if((_blob_array[i][1].y + _blob_array[i][1].height - buffer >= _notearr[j][1][1]) && 
 							   (_blob_array[i][1].y + _blob_array[i][1].height + buffer <= _notearr[j+1][1][1])) {
 								var testY:int = _blob_array[i][1].y + _blob_array[i][1].height -buffer;
 								//trace(" 2 this note's y is at "+testY+" and is between notes "+_notearr[j]+" and "+_notearr[j+1]);
+								//var blobLoc:int = _blob_array[i][1].y + _blob_array[i][1].height - buffer;
+								//trace("blob 1:"+blobLoc+", line 1:"+ _notearr[j][1][1]+", line 2:"+_notearr[j+1][1][1]);
 								
-								var lineYToMatch:int = getCloserLine(testY,_notearr[j][1] - buffer,_notearr[j+1][1][1] + buffer);
-								
+								var lineYToMatch:int = getCloserLine(testY,_notearr[j][1][1] - buffer,_notearr[j+1][1][1] + buffer);
+								trace('match mah line' +lineYToMatch);
 								//if(i+1 < _blob_array.length) {
 									//set note to closer letter
 									if(lineYToMatch == (_notearr[j][1][1] - buffer)) {
 										_blob_array[i].push(_notearr[j][0]);
-										trace("matches "+_notearr[j][0][1]);
+										trace("the note is "+_notearr[j][0]);
 									} else {
 										_blob_array[i].push(_notearr[j+1][0]);
-										trace("2 matches "+_notearr[j+1][1][1]);
+										trace("the note is "+_notearr[j+1][0]);
 									}
 									
-									trace(_blob_array[i]);
+									//trace('ahoy there '+_blob_array[i]);
 									break;
 								//}
+						   } else {
+							   trace('this isnt between any lines');
 						   }
 						} else {
-							trace(_notearr[j][0][1]);
+							//trace(_notearr[j][0][1]);
 						}/*else {
 							var testy:int = _blob_array[i][1].y + _blob_array[i][1].height -buffer;
 							trace("not in valid range. wat");
 							trace("3 this note's y is at "+testy);
 							trace("ranges are "+_notearr[j][1][1]+" and "+_notearr[j+1][1][1]);
 						}
-						
-						trace("i:"+i+", j:"+j);*/
+						*/
+						trace("i:"+i+", j:"+j);
 					}
 				}
 			}
