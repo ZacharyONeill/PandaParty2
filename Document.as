@@ -138,14 +138,52 @@
 				_staff_array = as3kinectUtils.getLines(_staff_bw_bmp.bitmapData,_staff_color_bmp.bitmapData);
 				
 				//trace(_staff_array);
+				//trace(_staff_array);
 				//are there 5 blobs? we have our staff, yay
 				if(_staff_array.length === 5) {
 					trace('All lines found. Begin Lesson 1.');
+					
 					for(var i=0; i < _staff_array.length; i++) {
 						tempStaff[i].push(new Array(_staff_array[i][1][0], _staff_array[i][1][1]));
 					}
 					
-			
+					/*
+			*
+					var theYs:Array = new Array();
+					for(var j:int = 0; j < tempStaff.length; j++) {
+						theYs.push(tempStaff[j][1][1]);
+						trace(tempStaff[j][1][1]);
+					}
+					
+					
+					//theYs.sort();
+					//trace(theYs);
+					
+					var k:int = 0;
+					
+					var lowest:int = 0; 
+					
+					var aTempStaff:Array = new Array();
+					
+					for(k; k < tempStaff.length;  k++) {
+						for(var l:int = 0; l < tempStaff.length; l++) {
+							lowest = tempStaff[k][1][1];
+							
+							if(aTempStaff.indexOf(lowest) == -1 && (tempStaff[k][1][1] !== tempStaff[l][1][1]) ) {
+								lowest = Math.min(tempStaff[k][1][1],tempStaff[l][1][1]);
+								if(tempStaff[k][1][1] === lowest)
+									aTempStaff.push(tempStaff[k][1][1]);
+								else(tempStaff[l][1][1] === lowest) 
+									aTempStaff.push(tempStaff[k][1][1]);
+							}
+						}
+						
+					}
+					
+					trace("staff is "+aTempStaff);
+					trace("amt of notes"+aTempStaff.length);
+					trace("amt of notes"+tempStaff.length);
+					*/
 					_staff_array = new Array();
 					_staff_array = tempStaff;
 					
@@ -182,6 +220,8 @@ trace('called');
 			
 				//trace("note "+_notearr[i][0]+" is at "+_notearr[i][1][0]+","+_notearr[i][1][1]);
 			}
+			
+ 
 		
 			_as3w.removeEventListener(as3kinectWrapperEvent.ON_VIDEO, detectStaff);
 			
