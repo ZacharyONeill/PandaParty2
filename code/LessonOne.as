@@ -145,41 +145,39 @@
 		}
 		
 		private function checkStaff(e:Event) {
-			//trace('timer is '+timer);
-			//if timer is running I definitely do not want to call this
-			if(timer == null) {
-				//if answer, user has placed note
-				if(answer) {
-					//double check, make sure there's really a note there. oh god  i hope there is.
-					if(myDoc._blob_array.length > 0) {
-						//trace("this blob is a "+myDoc._blob_array[0]);
+			
+			//clean staff
+			staff.cleanStaff(myDoc);
+			
+			//if answer, user has placed note
+			if(answer) {
+				//double check, make sure there's really a note there. oh god  i hope there is.
+				if(myDoc._blob_array.length > 0) {
+					trace("this blob is a "+myDoc._blob_array[0]);
+					
+					//ok let's just double check. is that letter there?
+					if(myDoc._blob_array[0][3]) {
+						myDoc.removeEventListener(Event.ENTER_FRAME,checkStaff);
+						timer = new Timer(1000,4);
+						timer.start();
 						
-						//ok let's just double check. is that letter there?
-						if(myDoc._blob_array[0][3]) {
-							//myDoc.removeEventListener(Event.ENTER_FRAME,checkStaff);
-							timer = new Timer(1000,4);
-							timer.start();
-							
-							
+						staff.addNote(myDoc,myDoc._blob_array[0][3],myDoc._blob_array[0][2]);
+						
+						if(myDoc._blob_array[0][3] == answer) {
+							feedback = new Feedback('Right');
+							soundPlayer = new SoundPlayer();
+							soundPlayer.playTone(answer);
 							staff.addNote(myDoc,myDoc._blob_array[0][3],myDoc._blob_array[0][2]);
-							
-							if(myDoc._blob_array[0][3] == answer) {
-								feedback = new Feedback('Right');
-								soundPlayer = new SoundPlayer();
-								soundPlayer.playTone(answer);
-								staff.addNote(myDoc,myDoc._blob_array[0][3],myDoc._blob_array[0][2]);
-								
-							} else {
-								feedback = new Feedback('Wrong');
-								//trace("false!");
-							}
-							
-							myDoc.addChild(feedback);
-							timer.addEventListener(TimerEvent.TIMER_COMPLETE,removeFeedback);
+						} else {
+							feedback = new Feedback('Wrong');
+							trace("false!");
 						}
-					} else {
 						
+						myDoc.addChild(feedback);
+						timer.addEventListener(TimerEvent.TIMER_COMPLETE,removeFeedback);
 					}
+				} else {
+					
 				}
 			}
 		}
@@ -187,9 +185,8 @@
 		private function removeFeedback(e:TimerEvent) {
 			myDoc.staffArea.removeChild(staff);
 			myDoc.removeChild(feedback);
-			feedback = null;
 			
-			trace('i has been called');
+			trace(feedback);
 			staff = new Staff(myDoc);
 			trace("4 seconds later");
 			if(correctFeedback) {

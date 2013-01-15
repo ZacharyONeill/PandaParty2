@@ -10,6 +10,8 @@
 											  new Array("low e"));
 											  
 		
+		private var existingNotes:Array = new Array();
+		
 		public function Staff(doc:Document,emphasis:String="none") {
 			drawLines(doc,emphasis);
 		}
@@ -45,6 +47,20 @@
 			var lineSpace:int = doc.staffArea.height/6
 			var theNote:MusicNote = new MusicNote(doc,staff,lineSpace,note,type);
 			doc.addChild(theNote);
+			existingNotes.push(theNote);
+		}
+		
+		
+		//clean staff - Called in LessonOne -> First function called in checkStaff, taking in document reference
+		public function cleanStaff(doc:Document){
+			
+			for(var i:int = 0; i < existingNotes.length; i++){
+
+				doc.removeChild(existingNotes[i]);
+				existingNotes[i] = null;
+				
+			}
+		
 		}
 
 	}
