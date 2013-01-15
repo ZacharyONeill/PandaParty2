@@ -4,7 +4,7 @@
 	import code.Staff;
 	import code.SoundPlayer;
 	import code.MusicNote;
-	
+	import code.Feedback;
 	import flash.utils.Timer;
 	
 	public class LessonOne extends Lessons {
@@ -27,8 +27,7 @@
 		private var staff:Staff;
 		private var soundPlayer:SoundPlayer; 
 		private var timer:Timer;
-		
-		private var currentNote:String = null;
+		private var feedback:Feedback;
 		
 		private var correctFeedback = false;
 		
@@ -116,8 +115,7 @@
 				}
 			} 
 			
-			//storeOldQuestions(note);
-			currentNote = note;
+			storeOldQuestions(note);
 			//trace("now on question "+currentQuestion);
 			//trace("part #"+currentPart);
 
@@ -147,6 +145,10 @@
 		}
 		
 		private function checkStaff(e:Event) {
+			
+			//clean staff
+			staff.cleanStaff(myDoc);
+			
 			//if answer, user has placed note
 			if(answer) {
 				//double check, make sure there's really a note there. oh god  i hope there is.
@@ -159,24 +161,19 @@
 						timer = new Timer(1000,4);
 						timer.start();
 						
-						
 						staff.addNote(myDoc,myDoc._blob_array[0][3],myDoc._blob_array[0][2]);
 						
-						myDoc.feedback.stop();
 						if(myDoc._blob_array[0][3] == answer) {
-							correctFeedback = true;
+							feedback = new Feedback('Right');
 							soundPlayer = new SoundPlayer();
 							soundPlayer.playTone(answer);
 							staff.addNote(myDoc,myDoc._blob_array[0][3],myDoc._blob_array[0][2]);
-							myDoc.feedback.gotoAndStop("Right");
-							
 						} else {
-							correctFeedback = false;
+							feedback = new Feedback('Wrong');
 							trace("false!");
-							myDoc.feedback.gotoAndStop("Wrong");
 						}
 						
-						myDoc.feedback.alpha = 1;
+						myDoc.addChild(feedback);
 						timer.addEventListener(TimerEvent.TIMER_COMPLETE,removeFeedback);
 					}
 				} else {
@@ -187,25 +184,24 @@
 		
 		private function removeFeedback(e:TimerEvent) {
 			myDoc.staffArea.removeChild(staff);
+			myDoc.removeChild(feedback);
+			
+			trace(feedback);
 			staff = new Staff(myDoc);
 			trace("4 seconds later");
 			if(correctFeedback) {
-				
-				storeOldQuestions(currentNote);
 				getLesson();
 				
 			} else {
 				if(numWrong < 3) {
 					numWrong++;
-				}
-				else{
-					getLesson();
+				} else {
 					
 				}
 				
 			}
 		
-			myDoc.feedback.alpha = 0;
+			//myDoc.feedback.alpha = 0;
 			myDoc.addEventListener(Event.ENTER_FRAME,checkStaff);
 			timer.removeEventListener(TimerEvent.TIMER_COMPLETE,removeFeedback);
 			
